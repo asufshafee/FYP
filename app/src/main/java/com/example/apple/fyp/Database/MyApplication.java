@@ -316,4 +316,8 @@ public class MyApplication extends Application {
     public void setCurrentReadEmail(EMailObject currentReadEmail) {
         CurrentReadEmail = currentReadEmail;
     }
+
+
+
+    ///asdjhfjknhgvjaggmfkjahmkvhetvjkhnkejagvktgakweytgvkaerjytgacykwwwww
 }
