@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/btn_Inbox"
+            android:icon="@drawable/inbox"
+            android:title="Inbox"
+            android:visible="false" />
+
+    </group>
+
+    <item android:title="All Labels">
+        <menu>
+            <item
+                android:id="@+id/btn_Allmails"
+                android:icon="@drawable/allmails"
+                android:title="All Mails"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Starred"
+                android:icon="@drawable/starred"
+                android:title="Starred"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Sent"
+                android:icon="@drawable/sent"
+                android:title="Sent"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Draft"
+                android:icon="@drawable/draft"
+                android:title="Draft"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Archive"
+                android:icon="@drawable/archive"
+                android:title="Archive"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Spam"
+                android:icon="@drawable/spam"
+                android:title="Spam"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Delete"
+                android:icon="@drawable/delete"
+                android:title="Delete"
+                android:visible="false" />
+            <item
+                android:id="@+id/CreateFolder"
+                android:icon="@drawable/delete"
+                android:title="Create Folder"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Setting"
+                android:icon="@drawable/setting"
+                android:title="Setting"
+                android:visible="false" />
+            <item
+                android:id="@+id/btn_Logout"
+                android:icon="@drawable/logout"
+                android:title="Logout"
+                android:visible="false" />
+        </menu>
+    </item>
+
+</menu>

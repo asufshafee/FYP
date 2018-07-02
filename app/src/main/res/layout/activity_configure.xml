@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context="com.example.apple.fyp.configureActivity">
+
+    <ImageView
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/configuration" />
+
+    <EditText
+        android:id="@+id/txtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:text="mytestapp321@hotmail.com"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/whiteColor"
+        android:hint="Email or Phone No"
+        android:inputType="textEmailAddress"
+        android:padding="8dp"
+        android:textColor="@color/socialColor" />
+
+    <EditText
+        android:id="@+id/txtPass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:text="malik123"
+        android:layout_marginTop="10dp"
+        android:background="@color/whiteColor"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="8dp"
+        android:textColor="@color/socialColor" />
+
+
+    <Button
+        android:id="@+id/Hotmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/socialColor"
+        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:text="Hotmail"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="30px" />
+    <Button
+        android:id="@+id/Gmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/socialColor"
+        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:text="Gmail"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="30px" />
+    <Button
+        android:id="@+id/Yahoo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/socialColor"
+        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:text="Yahoo"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="30px" />
+
+
+</LinearLayout>
