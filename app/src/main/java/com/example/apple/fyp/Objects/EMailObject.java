@@ -20,7 +20,15 @@ public class EMailObject {
     String Email;
     List<String> addresses;
     List<String> FromAddress;
+    long UniqueID;
 
+    public long getUniqueID() {
+        return UniqueID;
+    }
+
+    public void setUniqueID(long uniqueID) {
+        UniqueID = uniqueID;
+    }
 
     public List<String> getAddresses() {
         return addresses;

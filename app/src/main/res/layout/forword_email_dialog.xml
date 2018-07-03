@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="20dp">
@@ -26,26 +26,25 @@
 
 
             <TextView
-                android:id="@+id/Email"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:text="Email"
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
+                android:padding="10dp"
+                android:text="Enter Email"
                 android:textColor="@color/colorPrimary"
                 android:textSize="15dp" />
 
             <EditText
-                android:id="@+id/Messsage"
+                android:id="@+id/Email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
                 android:background="@drawable/shape_editext"
                 android:gravity="center|start|top"
-                android:hint="write Something to reply..."
-                android:lines="5"
+                android:hint="abc@gmail.com"
+                android:lines="1"
                 android:padding="5dp" />
 
             <LinearLayout
@@ -53,7 +52,7 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:id="@+id/Replay"
+                    android:id="@+id/ForWord"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="20dp"
@@ -61,7 +60,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
                     android:background="@color/colorPrimary"
-                    android:text="Replay"
+                    android:text="ForWord"
                     android:textColor="@android:color/white" />
 
                 <Button

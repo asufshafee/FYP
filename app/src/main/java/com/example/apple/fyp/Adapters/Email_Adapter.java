@@ -33,6 +33,7 @@ import com.example.apple.fyp.Objects.Menu;
 import com.example.apple.fyp.Objects.ServerHandler;
 import com.example.apple.fyp.R;
 import com.example.apple.fyp.ReadMailActivity;
+import com.example.apple.fyp.Utils.AppUtils;
 import com.example.apple.fyp.menu_inbox;
 
 import java.util.ArrayList;
@@ -84,7 +85,12 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         }
         this.FolderName = FolerName;
-        progressDialog = new ProgressDialog(context);
+        try {
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Loading....");
+        } catch (Exception Ex) {
+
+        }
 
     }
 
@@ -221,14 +227,16 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                new MoveEmailTask().execute();
+                if (AppUtils.haveNetworkConnection(context))
+                    new MoveEmailTask().execute();
                 myApplication.setCurrentEmailMoveObject(list.get(EmailPosition));
                 myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
                 myApplication.setCuurentEmailFolderToMove(List.get(position));
                 dialog.dismiss();
                 Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
                 list.get(EmailPosition).setMoved(List.get(position) + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
-                myApplication.SaveEmails();
+                myApplication.MoveEmail(list.get(EmailPosition), List.get(position) + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                String MovedFolder = List.get(position) + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
                 notifyDataSetChanged();
             }
         });
@@ -337,14 +345,15 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                String EmailFolderToMOve = List.get(position) + "/" + Email;
                 myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
                 myApplication.setCuurentEmailFolderToMove(List.get(position) + "/" + Email);
                 myApplication.setCurrentEmailMoveObject(list.get(EmailPosition));
-                new MoveEmailToOtherTask().execute();
+                if (AppUtils.haveNetworkConnection(context))
+                    new MoveEmailToOtherTask().execute();
                 Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
                 list.get(EmailPosition).setMoved(List.get(position) + "/" + Email);
                 myApplication.MoveEmail(list.get(EmailPosition), List.get(position) + "/" + Email);
-                myApplication.SaveEmails();
                 notifyDataSetChanged();
                 dialog.dismiss();
 
@@ -375,6 +384,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         @Override
         protected Void doInBackground(String... params) {
             //Copy you logic to calculate progress and call
+
+
 
             Store store = null;
             Properties properties = new Properties();
@@ -424,6 +435,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
+
         }
     }
 
@@ -439,7 +451,6 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         @Override
         protected Void doInBackground(String... params) {
             //Copy you logic to calculate progress and call
-            progressDialog.show();
 
             Store store = null;
             Properties properties = new Properties();
@@ -501,7 +512,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
-            progressDialog.dismiss();
+
         }
     }
 
@@ -592,8 +603,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 }
 
 
-                if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
-                    MoveFolder = store2.getFolder("[Gmail]/" + MOveFolderName);
+                if (MOveFolderName.split("/")[1].toLowerCase().contains("gmail") && !FolderName.contains("INBOX")) {
+                    MoveFolder = store2.getFolder("[Gmail]/" + MOveFolderName.split("/")[0]);
                 } else {
                     MoveFolder = store2.getFolder(MOveFolderName.split("/")[0]);
                 }

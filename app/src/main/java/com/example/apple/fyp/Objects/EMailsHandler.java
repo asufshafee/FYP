@@ -1,6 +1,7 @@
 package com.example.apple.fyp.Objects;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.apple.fyp.Database.MyApplication;
@@ -48,27 +49,19 @@ public class EMailsHandler {
 
     public Properties getYahoo() {
         Properties props = new Properties();
-        props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.host", "smtp.gmail.com");
+        props.put("mail.smtp.host", "smtp.mail.yahoo.com");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false");
+        props.put("mail.debug", "false");
+        props.put("mail.smtp.port", "587");
         return props;
     }
 
     public Properties getHotmail() {
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.host", "smtp.gmail.com");
+        props.setProperty("mail.host", "smtp.live.com");
+        props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false");
         return props;
     }
 
@@ -124,14 +117,11 @@ public class EMailsHandler {
                     try {
                         Transport.send(message);
                     } catch (MessagingException e) {
-                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-
                         e.printStackTrace();
                     }
                 }
             });
             thread.start();
-
             Toast.makeText(context, "Email Sent", Toast.LENGTH_SHORT).show();
             return true;
         } catch (Exception e) {

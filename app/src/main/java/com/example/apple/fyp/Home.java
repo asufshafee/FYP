@@ -21,13 +21,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.apple.fyp.Database.MyApplication;
+import com.example.apple.fyp.Objects.BlockMail;
 import com.example.apple.fyp.Objects.Email;
 import com.example.apple.fyp.Objects.ServerHandler;
+
+import org.angmarch.views.NiceSpinner;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -59,6 +65,8 @@ public class Home extends AppCompatActivity
         setSupportActionBar(toolbar);
         myApplication = (MyApplication) getApplicationContext();
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Wait....");
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +123,8 @@ public class Home extends AppCompatActivity
         }
     }
 
+    List<String> AccountRegistered = new LinkedList<>();
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -123,21 +133,30 @@ public class Home extends AppCompatActivity
 
         List<Email> Hotmail = myApplication.getEmail("Hotmail");
         if (Hotmail != null) {
-            for (Email email : Hotmail)
+            for (Email email : Hotmail) {
+                AccountRegistered.add(email.getEmail());
                 menu.add(Menu.NONE, 0, Menu.NONE, email.getEmail());
+
+            }
         }
         List<Email> Yahoo = myApplication.getEmail("Yahoo");
 
         if (Yahoo != null) {
-            for (Email email : Yahoo)
+            for (Email email : Yahoo) {
+                AccountRegistered.add(email.getEmail());
                 menu.add(Menu.NONE, 0, Menu.NONE, email.getEmail());
+
+            }
 
         }
         List<Email> Gmail = myApplication.getEmail("Gmail");
 
         if (Gmail != null) {
-            for (Email email : Gmail)
+            for (Email email : Gmail) {
+                AccountRegistered.add(email.getEmail());
                 menu.add(Menu.NONE, 0, Menu.NONE, email.getEmail());
+
+            }
 
         }
 
@@ -216,7 +235,9 @@ public class Home extends AppCompatActivity
         int id = item.getItemId();
 
 
-        if (item.getTitle().equals("INBOX")) {
+        if (item.getTitle().toString().equals("Block Email")) {
+            BlockEmailsDialog(Home.this);
+        } else if (item.getTitle().equals("INBOX")) {
             getSupportActionBar().setTitle(item.getTitle().toString());
             myApplication.setCurrentFolderName(item.getTitle().toString());
             CurrentFragment = new menu_inbox();
@@ -235,9 +256,62 @@ public class Home extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.container1, CurrentFragment).commit();
         }
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void BlockEmailsDialog(Activity activity) {
+
+        final Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.block_email_dialog);
+        final EditText Email = dialog.findViewById(R.id.Email);
+        final NiceSpinner Account = dialog.findViewById(R.id.Account);
+        Account.attachDataSource(AccountRegistered);
+        final ListView BlockEmails = dialog.findViewById(R.id.BlockEmails);
+
+        List<String> BlockEmailsStrings = new LinkedList<>();
+        for (BlockMail blockEmails : myApplication.getBlockMails())
+            BlockEmailsStrings.add(blockEmails.getEmail());
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.item_list, R.id.text_view_spinner, BlockEmailsStrings);
+        BlockEmails.setAdapter(adapter);
+
+
+        BlockEmails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+
+        dialog.findViewById(R.id.Block).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                BlockMail blockMail = new BlockMail();
+                blockMail.setAccount(AccountRegistered.get(Account.getSelectedIndex()));
+                blockMail.setEmail(Email.getText().toString());
+                myApplication.setBlockMails(blockMail);
+                Toast.makeText(getApplicationContext(), "Blocked", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+            }
+        });
+
+        dialog.findViewById(R.id.Cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
     }
 
 
@@ -258,7 +332,13 @@ public class Home extends AppCompatActivity
                 List<String> menusList = myApplication.getOnlineManus();
                 menusList.add(FolderName.getText().toString());
                 menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+                menusList.remove(menusList.size() - 1);
+                menusList.add(FolderName.getText().toString());
+                menusList.add("Logout");
                 myApplication.AddMenus(menusList);
+                menu.clear();
+                for (String Menus : menusList)
+                    menu.add(Menus);
                 dialog.dismiss();
             }
         });
@@ -384,7 +464,7 @@ public class Home extends AppCompatActivity
                 if (myApplication.getCurrentLogin().toLowerCase().contains("yahoo"))
                     store.connect("imap.mail.yahoo.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
                 if (myApplication.getCurrentLogin().toLowerCase().contains("hotmail"))
-                    store.connect("pop3.live.com", 995, myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+                    store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
             } catch (NoSuchProviderException e) {
                 e.printStackTrace();
@@ -475,6 +555,7 @@ public class Home extends AppCompatActivity
                 }
                 menusList.add("INBOX");
                 menusList.add("Create Folder");
+                menusList.add("Block Email");
                 for (final javax.mail.Folder folder : folders) {
 
                     try {

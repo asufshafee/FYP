@@ -36,6 +36,7 @@ public class configureActivity extends AppCompatActivity {
         setContentView(R.layout.activity_configure);
 
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Wait....");
 
 
         txtmail = (EditText) findViewById(R.id.txtEmail);

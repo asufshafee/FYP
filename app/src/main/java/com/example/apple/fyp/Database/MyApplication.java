@@ -3,6 +3,7 @@ package com.example.apple.fyp.Database;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.example.apple.fyp.Objects.BlockMail;
 import com.example.apple.fyp.Objects.EMailObject;
 import com.example.apple.fyp.Objects.Email;
 import com.example.apple.fyp.Objects.Menu;
@@ -45,6 +46,7 @@ public class MyApplication extends Application {
     EMailObject CurrentEmailMoveObject = null;
     String CuurentEmailFolderToMove = "";
     EMailObject CurrentReadEmail = null;
+    List<BlockMail> blockMails;
 
 
     @Override
@@ -56,6 +58,11 @@ public class MyApplication extends Application {
 
 
         listNewEmails = new EasySave(getApplicationContext()).retrieveList("Emails", EMailObject[].class);
+        blockMails = new EasySave(getApplicationContext()).retrieveList("Block", BlockMail[].class);
+
+        if (blockMails == null) {
+            blockMails = new LinkedList<>();
+        }
         ALlEmailMenusOnline = new LinkedHashMap<>();
         if (listNewEmails == null) {
             listNewEmails = new LinkedList<>();
@@ -112,7 +119,7 @@ public class MyApplication extends Application {
 
     public void MarkRead(EMailObject eMailObject) {
         for (EMailObject eMailObject1 : listNewEmails) {
-            if (eMailObject1.getId() == eMailObject.getId()) {
+            if (eMailObject1.getUniqueID() == eMailObject.getUniqueID()) {
                 eMailObject1.setUnRead(true);
             }
         }
@@ -121,7 +128,7 @@ public class MyApplication extends Application {
 
     public void MarkDelete(EMailObject eMailObject) {
         for (EMailObject eMailObject1 : listNewEmails) {
-            if (eMailObject1.getId() == eMailObject.getId()) {
+            if (eMailObject1.getUniqueID() == eMailObject.getUniqueID()) {
                 eMailObject1.setDeleted(true);
             }
         }
@@ -130,8 +137,9 @@ public class MyApplication extends Application {
 
     public void MoveEmail(EMailObject eMailObject, String FolderName) {
         for (EMailObject eMailObject1 : listNewEmails) {
-            if (eMailObject1.getId() == eMailObject.getId()) {
+            if (eMailObject1.getUniqueID() == eMailObject.getUniqueID()) {
                 eMailObject1.setMoved(FolderName);
+                eMailObject1.setEmail(FolderName.split("/")[1]);
             }
         }
         SaveEmails();
@@ -318,6 +326,26 @@ public class MyApplication extends Application {
     }
 
 
+    public List<BlockMail> getBlockMails() {
+        return blockMails;
+    }
 
-    ///asdjhfjknhgvjaggmfkjahmkvhetvjkhnkejagvktgakweytgvkaerjytgacykwwwww
+    public void setBlockMails(BlockMail blockMail) {
+        this.blockMails.add(blockMail);
+        new EasySave(getApplicationContext()).saveList("Block", blockMails);
+    }
+
+
+    public List<String> getBlockMails(String Account) {
+
+        List<String> BlockEmails = new LinkedList<>();
+        for (BlockMail blockMail : getBlockMails()) {
+            if (blockMail.getAccount().equals(Account)) {
+                BlockEmails.add(blockMail.getEmail());
+            }
+        }
+        return BlockEmails;
+    }
+
+
 }

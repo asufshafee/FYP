@@ -21,10 +21,12 @@ import com.example.apple.fyp.Adapters.Email_Adapter;
 import com.example.apple.fyp.Database.MyApplication;
 import com.example.apple.fyp.Objects.EMailObject;
 import com.example.apple.fyp.Objects.ServerHandler;
+import com.example.apple.fyp.Utils.AppUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +37,7 @@ import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
@@ -104,6 +107,7 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
         String FolderName = myApplication.getCurrentFolderName();
         list = myApplication.getEmailsWithFolderName(myApplication.getCurrentFolderName() + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
         mSwipeRefreshLayout.setRefreshing(true);
+        myApplication.setCurrentEmailMoveFolderName(myApplication.getCurrentFolderName() + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
 
         Collections.sort(list, new Comparator<EMailObject>() {
             public int compare(EMailObject obj1, EMailObject obj2) {
@@ -122,7 +126,9 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
 
         }
         ShowList();
-        getEmailTask.execute();
+        if (AppUtils.haveNetworkConnection(getActivity()))
+            getEmailTask.execute();
+        else mSwipeRefreshLayout.setRefreshing(false);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -149,6 +155,8 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
     GetEmailTask getEmailTask;
 
     public void RefreshList() {
+        if (!AppUtils.haveNetworkConnection(getActivity()))
+            return;
 
         if (getEmailTask.getStatus() == AsyncTask.Status.RUNNING) {
         } else {
@@ -242,6 +250,9 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
         if (Connected) {
             int count = 0;
             Folder emailFolder = null;
+            Folder MoveFolder = null;
+            String DeletedFolderName = "";
+
             String FolderName = myApplication.getCurrentFolderName();
             try {
                 if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
@@ -249,9 +260,24 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
                 } else {
                     emailFolder = store.getFolder(FolderName);
                 }
+
+
+                if (myApplication.getCurrentLogin().equals("Gmail")) {
+                    MoveFolder = store.getFolder("[Gmail]/Spam");
+                    DeletedFolderName = "Spam";
+                } else if (myApplication.getCurrentLogin().equals("yahoo")) {
+                    MoveFolder = store.getFolder("Trash");
+                    DeletedFolderName = "Trash";
+                } else {
+                    MoveFolder = store.getFolder("Deleted");
+                    DeletedFolderName = "Deleted";
+
+                }
+
+
                 // use READ_ONLY if you don't wish the messages
                 // to be marked as read after retrieving its content
-                emailFolder.open(Folder.READ_ONLY);
+                emailFolder.open(Folder.READ_WRITE);
 
                 count = emailFolder.getMessages().length;
             } catch (MessagingException e) {
@@ -336,6 +362,7 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
                     eMailObject.setTime(getCurrentTimeStamp(message.getReceivedDate()));
                     eMailObject.setId(message.getMessageNumber());
 
+                    eMailObject.setUniqueID(Calendar.getInstance().getTimeInMillis());
                     List<String> AllRecipients = new LinkedList<>();
                     for (Address address : message.getAllRecipients())
                         AllRecipients.add(address.toString());
@@ -347,7 +374,6 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
 
                     eMailObject.setAddresses(AllRecipients);
                     eMailObject.setFromAddress(From);
-
                     if (!message.getFlags().contains(Flags.Flag.SEEN))
                         eMailObject.setUnRead(false);
                     eMailObject.setSubject(subject);
@@ -356,6 +382,24 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
                     eMailObject.setMessage(messageContent);
                     eMailObject.setMoved(myApplication.getCurrentFolderName() + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
                     eMailObject.setEmail(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+
+
+                    List<String> BlockEmails = myApplication.getBlockMails(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+
+                    for (String Email : BlockEmails) {
+                        for (Address address : message.getFrom()) {
+                            if (address.toString().contains(Email)) {
+
+                                message.getFolder().copyMessages(new Message[]{message}, MoveFolder);
+                                message.setFlag(Flags.Flag.DELETED, true);
+                                message.getFolder().expunge();
+                                eMailObject.setMoved(DeletedFolderName + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+
+
+                            }
+                        }
+                    }
+
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -421,22 +465,6 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    private boolean createFolder(Folder parent, String folderName) {
-        boolean isCreated = true;
-
-        try {
-            Folder newFolder = parent.getFolder(folderName);
-            isCreated = newFolder.create(Folder.HOLDS_MESSAGES);
-            System.out.println("created: " + isCreated);
-
-        } catch (Exception e) {
-            System.out.println("Error creating folder: " + e.getMessage());
-            e.printStackTrace();
-            isCreated = false;
-        }
-        return isCreated;
     }
 
 
