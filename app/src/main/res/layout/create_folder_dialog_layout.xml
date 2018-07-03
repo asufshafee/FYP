@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:gravity="center"
-                android:text="Enter Folder Name To Create"
+                android:text="Enter Folder Name to Create"
                 android:textColor="@android:color/black"
                 android:textSize="14dp"
                 android:textStyle="bold" />
