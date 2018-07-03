@@ -386,7 +386,6 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
             //Copy you logic to calculate progress and call
 
 
-
             Store store = null;
             Properties properties = new Properties();
             properties.put("mail.store.protocol", "imaps");
@@ -585,9 +584,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                     store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
 
-            } catch (NoSuchProviderException e) {
-                e.printStackTrace();
-            } catch (MessagingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -597,14 +594,20 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
             try {
                 if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
-                    emailFolder = store.getFolder("[Gmail]/" + FolderName);
+                    emailFolder = store.getFolder("[Gmail]/" + FolderName.split("/")[0]);
                 } else {
                     emailFolder = store.getFolder(FolderName);
                 }
 
 
-                if (MOveFolderName.split("/")[1].toLowerCase().contains("gmail") && !FolderName.contains("INBOX")) {
-                    MoveFolder = store2.getFolder("[Gmail]/" + MOveFolderName.split("/")[0]);
+                if (MOveFolderName.split("/")[1].toLowerCase().contains("gmail")) {
+                    if (!MOveFolderName.split("/")[0].contains("INBOX"))
+                    {
+                        MoveFolder = store2.getFolder("[Gmail]/" + MOveFolderName.split("/")[0]);
+                    }else{
+                        MoveFolder = store2.getFolder(MOveFolderName.split("/")[0]);
+
+                    }
                 } else {
                     MoveFolder = store2.getFolder(MOveFolderName.split("/")[0]);
                 }

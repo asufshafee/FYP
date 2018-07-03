@@ -231,9 +231,7 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
             if (myApplication.getCurrentLogin().toLowerCase().contains("hotmail"))
                 store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Connected = store.isConnected();
@@ -300,7 +298,7 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
             javax.mail.Message[] messages = new javax.mail.Message[count];
 
             try {
-                if (list.size() >= emailFolder.getMessages().length) {
+                if (list.size()+1 >= emailFolder.getMessages().length) {
                     getActivity().runOnUiThread(new Runnable() {
 
                         @Override
