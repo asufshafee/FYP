@@ -633,5 +633,6 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         protected void onPostExecute(Void result) {
         }
     }
+
 }
 
