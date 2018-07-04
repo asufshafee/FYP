@@ -666,9 +666,9 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                                 FolderName.contains("Sent Mail") ||
                                 FolderName.contains("Spam") ||
                                 FolderName.contains("Starred")) {
-                            emailFolder = store2.getFolder("[Gmail]/" + FolderName.split("/")[0]);
+                            emailFolder = store.getFolder("[Gmail]/" + FolderName.split("/")[0]);
                         } else {
-                            emailFolder = store2.getFolder(FolderName.split("/")[0]);
+                            emailFolder = store.getFolder(FolderName.split("/")[0]);
                         }
                     } else {
                         emailFolder = store.getFolder(FolderName.split("/")[0]);
@@ -682,26 +682,26 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                                 FolderName.contains("Spam") ||
                                 FolderName.contains("Starred")) {
                             if (FolderName.contains("/")) {
-                                emailFolder = store2.getFolder("[Gmail]/" + FolderName.split("/")[0]);
+                                emailFolder = store.getFolder("[Gmail]/" + FolderName.split("/")[0]);
 
                             } else {
-                                emailFolder = store2.getFolder("[Gmail]/" + FolderName);
+                                emailFolder = store.getFolder("[Gmail]/" + FolderName);
 
                             }
                         } else {
                             if (FolderName.contains("/")) {
-                                emailFolder = store2.getFolder(FolderName.split("/")[0]);
+                                emailFolder = store.getFolder(FolderName.split("/")[0]);
 
                             } else {
-                                emailFolder = store2.getFolder(FolderName);
+                                emailFolder = store.getFolder(FolderName);
                             }
                         }
                     } else {
                         if (FolderName.contains("/")) {
-                            emailFolder = store2.getFolder(FolderName.split("/")[0]);
+                            emailFolder = store.getFolder(FolderName.split("/")[0]);
 
                         } else {
-                            emailFolder = store2.getFolder(FolderName);
+                            emailFolder = store.getFolder(FolderName);
                         }
                     }
                 }
@@ -745,13 +745,12 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         @Override
         protected void onPostExecute(Void result) {
             if (MoveedTrue) {
-
                 Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
                 list.get(Position1).setMoved("Archive1" + "/" + myApplication.getArchive().getEmail());
                 myApplication.MoveEmail(list.get(Position1), "Archive1" + "/" + myApplication.getArchive().getEmail());
                 notifyDataSetChanged();
             }
-            ((Home) context).HideProgress("Moved");
+            ((Home) context).HideProgress("");
 
         }
     }
