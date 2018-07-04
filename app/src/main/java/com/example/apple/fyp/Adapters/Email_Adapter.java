@@ -171,26 +171,29 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                     @Override
                     public void onClick(View v) {
 
-                        if (AppUtils.haveNetworkConnection(context))
+                        if (AppUtils.haveNetworkConnection(context)) {
                             new CreateFolderTask().execute("Archive");
-                        List<String> menusList = myApplication.getOnlineManus();
-                        menusList.add("Archive");
-                        menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
-                        menusList.remove(menusList.size() - 1);
-                        menusList.add("Archive");
-                        menusList.add("Logout");
-                        menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
-                        myApplication.AddMenus(menusList);
-                        ((Home) context).UpdateMenus();
-                        myApplication.setCurrentEmailMoveObject(list.get(Position));
-                        myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
-                        myApplication.setCuurentEmailFolderToMove("Archive");
-                        Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
-                        list.get(Position).setMoved("Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
-                        myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
-                        String MovedFolder = "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
-                        notifyDataSetChanged();
-                        Optiondialog.dismiss();
+                            List<String> menusList = myApplication.getOnlineManus();
+                            menusList.add("Archive");
+                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+                            menusList.remove(menusList.size() - 1);
+                            menusList.add("Archive");
+                            menusList.add("Logout");
+                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+                            myApplication.AddMenus(menusList);
+                            ((Home) context).UpdateMenus();
+                            myApplication.setCurrentEmailMoveObject(list.get(Position));
+                            myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
+                            myApplication.setCuurentEmailFolderToMove("Archive");
+                            Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
+                            list.get(Position).setMoved("Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                            myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                            String MovedFolder = "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
+                            notifyDataSetChanged();
+                            Optiondialog.dismiss();
+                        } else {
+                            Toast.makeText(context, "No internet Connection", Toast.LENGTH_SHORT).show();
+                        }
 
 
                     }
