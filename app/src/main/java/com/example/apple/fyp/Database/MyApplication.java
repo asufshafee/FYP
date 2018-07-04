@@ -373,7 +373,9 @@ public class MyApplication extends Application {
                 }
             }
         }
-        this.archiveList.add(archive);
+        List<Archive> archiveList1 = new LinkedList<>(archiveList);
+        archiveList1.add(archive);
+        this.archiveList = new LinkedList<>(archiveList1);
         new EasySave(getApplicationContext()).saveList("archiveList", archiveList);
     }
 }

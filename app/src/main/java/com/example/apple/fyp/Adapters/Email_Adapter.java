@@ -172,7 +172,16 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                     public void onClick(View v) {
 
                         if (AppUtils.haveNetworkConnection(context))
-                            new MoveToArchive().execute();
+                            new CreateFolderTask().execute("Archive");
+                        List<String> menusList = myApplication.getOnlineManus();
+                        menusList.add("Archive");
+                        menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+                        menusList.remove(menusList.size() - 1);
+                        menusList.add("Archive");
+                        menusList.add("Logout");
+                        menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+                        myApplication.AddMenus(menusList);
+                        ((Home) context).UpdateMenus();
                         myApplication.setCurrentEmailMoveObject(list.get(Position));
                         myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
                         myApplication.setCuurentEmailFolderToMove("Archive");
@@ -791,5 +800,87 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         }
     }
+
+
+    private class CreateFolderTask extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            //Copy you logic to calculate progress and call
+
+            ((Home) context).ShowProgress();
+            Store store = null;
+            Properties properties = new Properties();
+            properties.put("mail.store.protocol", "imaps");
+
+            Session emailSession = Session.getDefaultInstance(properties);
+
+            try {
+                store = emailSession.getStore();
+                if (myApplication.getCurrentLogin().toLowerCase().contains("gmail"))
+                    store.connect(ServerHandler.GMAIL_HOST, myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+                if (myApplication.getCurrentLogin().toLowerCase().contains("yahoo"))
+                    store.connect("imap.mail.yahoo.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+                if (myApplication.getCurrentLogin().toLowerCase().contains("hotmail"))
+                    store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+
+            } catch (NoSuchProviderException e) {
+                ((Home) context).HideProgress(e.getMessage());
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
+                e.printStackTrace();
+            }
+
+            if (store.isConnected()) {
+                try {
+                    Folder defaultFolder = store.getDefaultFolder();
+                    if (createFolder(defaultFolder, params[0])) {
+
+                    } else {
+                    }
+
+                } catch (MessagingException e) {
+                    ((Home) context).HideProgress(e.getMessage());
+
+                    e.printStackTrace();
+                }
+
+            }
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            new MoveToArchive().execute();
+            ((Home) context).HideProgress("");
+        }
+    }
+
+    private boolean createFolder(Folder parent, String folderName) {
+        boolean isCreated = true;
+
+        try {
+            Folder newFolder = parent.getFolder(folderName);
+            isCreated = newFolder.create(Folder.HOLDS_MESSAGES);
+            System.out.println("created: " + isCreated);
+
+        } catch (Exception e) {
+            System.out.println("Error creating folder: " + e.getMessage());
+            e.printStackTrace();
+            isCreated = false;
+        }
+        return isCreated;
+    }
+
 }
 

@@ -288,7 +288,7 @@ public class Home extends AppCompatActivity
 
                 Archive archive = new Archive();
                 archive.setCheck(true);
-                archive.setEmail(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                archive.setEmail(AccountRegistered.get(Account.getSelectedIndex()));
                 myApplication.setArchive(archive);
                 dialog.dismiss();
             }
@@ -453,7 +453,13 @@ public class Home extends AppCompatActivity
             }
         });
 
-        dialog.show();
+        try {
+            dialog.show();
+
+        }catch (Exception  e)
+        {
+
+        }
 
     }
 
@@ -746,6 +752,13 @@ public class Home extends AppCompatActivity
             }
         });
 
+    }
+
+
+    public void UpdateMenus() {
+        menu.clear();
+        for (String Menus : myApplication.getOnlineManus())
+            menu.add(Menus);
     }
 
 }
