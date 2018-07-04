@@ -745,9 +745,10 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         @Override
         protected void onPostExecute(Void result) {
             if (MoveedTrue) {
+
                 Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
-                list.get(Position1).setMoved("Archive" + "/" + myApplication.getArchive().getEmail());
-                myApplication.MoveEmail(list.get(Position1), "Archive" + "/" + myApplication.getArchive().getEmail());
+                list.get(Position1).setMoved("Archive1" + "/" + myApplication.getArchive().getEmail());
+                myApplication.MoveEmail(list.get(Position1), "Archive1" + "/" + myApplication.getArchive().getEmail());
                 notifyDataSetChanged();
             }
             ((Home) context).HideProgress("Moved");
