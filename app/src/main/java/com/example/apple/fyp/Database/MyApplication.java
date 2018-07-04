@@ -86,18 +86,19 @@ public class MyApplication extends Application {
         }
 
 
-        if (getAllEmailMenusOnline().equals("")) {
-            ALlEmailMenusOnline = new HashMap<>();
-            OnlineManus = new LinkedList<>();
-
-        } else {
-            java.lang.reflect.Type type = new TypeToken<HashMap<String, List<String>>>() {
-            }.getType();
-            ALlEmailMenusOnline = gson.fromJson(getAllEmailMenusOnline(), type);
-            OnlineManus = ALlEmailMenusOnline.get(getEmail(getCurrentLogin()).get(getCurrentLoginEmailIndex()).getEmail());
-            if (OnlineManus == null)
-                OnlineManus = new LinkedList<>();
-        }
+        ALlEmailMenusOnline = new HashMap<>();
+//        if (getAllEmailMenusOnline().equals("")) {
+//            ALlEmailMenusOnline = new HashMap<>();
+//            OnlineManus = new LinkedList<>();
+//
+//        } else {
+//            java.lang.reflect.Type type = new TypeToken<HashMap<String, List<String>>>() {
+//            }.getType();
+//            ALlEmailMenusOnline = gson.fromJson(getAllEmailMenusOnline(), type);
+//            OnlineManus = ALlEmailMenusOnline.get(getEmail(getCurrentLogin()).get(getCurrentLoginEmailIndex()).getEmail());
+//            if (OnlineManus == null)
+//                OnlineManus = new LinkedList<>();
+//        }
 
         super.onCreate();
     }
