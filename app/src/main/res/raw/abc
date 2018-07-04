@@ -6,3 +6,5 @@ cost a rahii ha
 
 
 web service ka issue a raha ha usy
+ussy kah ya deya kar
+    public static String ServerAddress="http://192.168.0.61/JukeBox/Service1.svc/";
