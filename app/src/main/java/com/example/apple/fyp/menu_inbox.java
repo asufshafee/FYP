@@ -272,12 +272,12 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
 
                 }
 
-
                 // use READ_ONLY if you don't wish the messages
                 // to be marked as read after retrieving its content
                 emailFolder.open(Folder.READ_WRITE);
 
                 count = emailFolder.getMessages().length;
+
             } catch (MessagingException e) {
                 String Mesage = e.getMessage();
                 e.printStackTrace();
@@ -298,7 +298,7 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
             javax.mail.Message[] messages = new javax.mail.Message[count];
 
             try {
-                if (list.size()+1 >= emailFolder.getMessages().length) {
+                if (list.size() >= emailFolder.getMessages().length) {
                     getActivity().runOnUiThread(new Runnable() {
 
                         @Override
@@ -320,8 +320,10 @@ public class menu_inbox extends Fragment implements SwipeRefreshLayout.OnRefresh
                     Log.d("FYPLogsMantains", "Total Left " + String.valueOf(messages.length));
                     total = messages.length + list.size();
                 }
-            } catch (MessagingException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                                e.printStackTrace();
+
+                return;
             }
             for (int i = 0; i < (messages.length); i++) {
 

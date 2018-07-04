@@ -56,8 +56,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
     MyApplication myApplication;
     Dialog Optiondialog;
     String FolderName;
-
     ProgressDialog progressDialog;
+    Boolean Check = false;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CardView Card;
@@ -349,6 +349,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
                 myApplication.setCuurentEmailFolderToMove(List.get(position) + "/" + Email);
                 myApplication.setCurrentEmailMoveObject(list.get(EmailPosition));
+                if (Email.toLowerCase().contains(myApplication.getCurrentLogin().toLowerCase()))
+                    Check = true;
                 if (AppUtils.haveNetworkConnection(context))
                     new MoveEmailToOtherTask().execute();
                 Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
@@ -386,6 +388,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
             //Copy you logic to calculate progress and call
 
 
+            ((Home) context).ShowProgress();
+
             Store store = null;
             Properties properties = new Properties();
             properties.put("mail.store.protocol", "imaps");
@@ -402,8 +406,12 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                     store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
             } catch (NoSuchProviderException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
                 e.printStackTrace();
             } catch (MessagingException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
                 e.printStackTrace();
             }
 
@@ -423,7 +431,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 message.getFolder().expunge();
 
             } catch (Exception e) {
-                String Mesage = e.getMessage();
+                ((Home) context).HideProgress(e.getMessage());
                 e.printStackTrace();
             }
 
@@ -434,7 +442,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
-
+            ((Home) context).HideProgress("Deleted");
         }
     }
 
@@ -451,6 +459,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         protected Void doInBackground(String... params) {
             //Copy you logic to calculate progress and call
 
+            ((Home) context).ShowProgress();
             Store store = null;
             Properties properties = new Properties();
             properties.put("mail.store.protocol", "imaps");
@@ -467,8 +476,12 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                     store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
             } catch (NoSuchProviderException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
                 e.printStackTrace();
             } catch (MessagingException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
                 e.printStackTrace();
             }
 
@@ -500,7 +513,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 message.getFolder().expunge();
 
             } catch (Exception e) {
-                String Mesage = e.getMessage();
+                ((Home) context).HideProgress(e.getMessage());
+
                 e.printStackTrace();
             }
 
@@ -511,6 +525,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
+            ((Home) context).HideProgress("Moved");
 
         }
     }
@@ -526,6 +541,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected Void doInBackground(String... params) {
+            ((Home) context).ShowProgress();
             //Copy you logic to calculate progress and call
             String FolderName = myApplication.getCurrentEmailMoveFolderName();
             String MOveFolderName = myApplication.getCuurentEmailFolderToMove();
@@ -585,6 +601,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
 
             } catch (Exception e) {
+                ((Home) context).HideProgress(e.getMessage());
                 e.printStackTrace();
             }
 
@@ -593,20 +610,49 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
 
             try {
-                if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
-                    emailFolder = store.getFolder("[Gmail]/" + FolderName.split("/")[0]);
+                if (Check) {
+                    if (FolderName.toLowerCase().contains("gmail")) {
+                        if (FolderName.contains("All Mail") ||
+                                FolderName.contains("Bin") ||
+                                FolderName.contains("Drafts") ||
+                                FolderName.contains("Sent Mail") ||
+                                FolderName.contains("Spam") ||
+                                FolderName.contains("Starred")) {
+                            emailFolder = store2.getFolder("[Gmail]/" + FolderName.split("/")[0]);
+                        } else {
+                            emailFolder = store2.getFolder(FolderName.split("/")[0]);
+                        }
+                    } else {
+                        emailFolder = store.getFolder(FolderName);
+                    }
                 } else {
-                    emailFolder = store.getFolder(FolderName);
+                    if (FolderName.toLowerCase().contains("gmail")) {
+                        if (FolderName.contains("All Mail") ||
+                                FolderName.contains("Bin") ||
+                                FolderName.contains("Drafts") ||
+                                FolderName.contains("Sent Mail") ||
+                                FolderName.contains("Spam") ||
+                                FolderName.contains("Starred")) {
+                            emailFolder = store2.getFolder("[Gmail]/" + FolderName);
+                        } else {
+                            emailFolder = store2.getFolder(FolderName);
+                        }
+                    } else {
+                        emailFolder = store.getFolder(FolderName);
+                    }
                 }
 
 
                 if (MOveFolderName.split("/")[1].toLowerCase().contains("gmail")) {
-                    if (!MOveFolderName.split("/")[0].contains("INBOX"))
-                    {
+                    if (MOveFolderName.split("/")[0].contains("All Mail") ||
+                            MOveFolderName.split("/")[0].contains("Bin") ||
+                            MOveFolderName.split("/")[0].contains("Drafts") ||
+                            MOveFolderName.split("/")[0].contains("Sent Mail") ||
+                            MOveFolderName.split("/")[0].contains("Spam") ||
+                            MOveFolderName.split("/")[0].contains("Starred")) {
                         MoveFolder = store2.getFolder("[Gmail]/" + MOveFolderName.split("/")[0]);
-                    }else{
+                    } else {
                         MoveFolder = store2.getFolder(MOveFolderName.split("/")[0]);
-
                     }
                 } else {
                     MoveFolder = store2.getFolder(MOveFolderName.split("/")[0]);
@@ -620,6 +666,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 message.getFolder().expunge();
 
             } catch (Exception e) {
+                ((Home) context).HideProgress(e.getMessage());
+
                 String Mesage = e.getMessage();
                 e.printStackTrace();
             }
@@ -631,6 +679,8 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
+            ((Home) context).HideProgress("Moved");
+
         }
     }
 
