@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.apple.fyp.Database.MyApplication;
+import com.example.apple.fyp.Objects.Archive;
 import com.example.apple.fyp.Objects.BlockMail;
 import com.example.apple.fyp.Objects.Email;
 import com.example.apple.fyp.Objects.ServerHandler;
@@ -175,6 +176,10 @@ public class Home extends AppCompatActivity
             AddAccount(Home.this);
             return true;
         }
+        if (id == R.id.Archive) {
+            AddArchive(Home.this);
+
+        }
 
         if (id == 0) {
             if (item.getTitle().toString().contains("gmail")) {
@@ -260,6 +265,36 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void AddArchive(Activity activity) {
+
+        final Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.dialog_archive);
+        final NiceSpinner Account = dialog.findViewById(R.id.Account);
+        Account.attachDataSource(AccountRegistered);
+
+        List<String> BlockEmailsStrings = new LinkedList<>();
+        for (BlockMail blockEmails : myApplication.getBlockMails())
+            BlockEmailsStrings.add(blockEmails.getEmail());
+
+        dialog.findViewById(R.id.AddArchive).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Archive archive = new Archive();
+                archive.setCheck(true);
+                archive.setEmail(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                myApplication.setArchive(archive);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
     }
 
 

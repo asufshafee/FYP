@@ -163,6 +163,31 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         Optiondialog.setCancelable(true);
         Optiondialog.setContentView(R.layout.select_an_layout_dialog);
 
+        if (myApplication.getArchive(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()) != null) {
+
+            if (myApplication.getArchive(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()).getCheck()) {
+                Optiondialog.findViewById(R.id.Archive).setVisibility(View.VISIBLE);
+                Optiondialog.findViewById(R.id.Archive).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (AppUtils.haveNetworkConnection(context))
+                            new MoveToArchive().execute();
+                        myApplication.setCurrentEmailMoveObject(list.get(Position));
+                        myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
+                        myApplication.setCuurentEmailFolderToMove("Archive");
+                        Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
+                        list.get(Position).setMoved("Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                        myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+                        String MovedFolder = "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
+                        notifyDataSetChanged();
+                        Optiondialog.dismiss();
+
+
+                    }
+                });
+            }
+        }
 
         Optiondialog.findViewById(R.id.Delete).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -684,5 +709,87 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         }
     }
 
+    private class MoveToArchive extends AsyncTask<String, Void, Void> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            //Copy you logic to calculate progress and call
+
+            ((Home) context).ShowProgress();
+            Store store = null;
+            Properties properties = new Properties();
+            properties.put("mail.store.protocol", "imaps");
+
+            Session emailSession = Session.getDefaultInstance(properties);
+
+            try {
+                store = emailSession.getStore();
+                if (myApplication.getCurrentLogin().toLowerCase().contains("gmail"))
+                    store.connect(ServerHandler.GMAIL_HOST, myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+                if (myApplication.getCurrentLogin().toLowerCase().contains("yahoo"))
+                    store.connect("imap.mail.yahoo.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+                if (myApplication.getCurrentLogin().toLowerCase().contains("hotmail"))
+                    store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
+
+            } catch (NoSuchProviderException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                ((Home) context).HideProgress(e.getMessage());
+
+                e.printStackTrace();
+            }
+
+            Folder emailFolder = null;
+            Folder MoveFolder = null;
+
+            String FolderName = myApplication.getCurrentEmailMoveFolderName();
+            String MOveFolderName = myApplication.getCuurentEmailFolderToMove();
+
+            try {
+                if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
+                    emailFolder = store.getFolder("[Gmail]/" + FolderName);
+                } else {
+                    emailFolder = store.getFolder(FolderName);
+                }
+
+
+                if (myApplication.getCurrentLogin().equals("Gmail") && !FolderName.contains("INBOX")) {
+                    MoveFolder = store.getFolder("[Gmail]/" + MOveFolderName);
+                } else {
+                    MoveFolder = store.getFolder(MOveFolderName);
+                }
+                // use READ_ONLY if you don't wish the messages
+                // to be marked as read after retrieving its content
+                emailFolder.open(Folder.READ_WRITE);
+                Message message = emailFolder.getMessage(myApplication.getCurrentEmailMoveObject().getId());
+                message.getFolder().copyMessages(new Message[]{message}, MoveFolder);
+                message.setFlag(Flags.Flag.DELETED, true);
+                message.getFolder().expunge();
+
+            } catch (Exception e) {
+                ((Home) context).HideProgress(e.getMessage());
+
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            ((Home) context).HideProgress("Moved");
+
+        }
+    }
 }
 

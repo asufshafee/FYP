@@ -2,7 +2,9 @@ package com.example.apple.fyp.Database;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
+import com.example.apple.fyp.Objects.Archive;
 import com.example.apple.fyp.Objects.BlockMail;
 import com.example.apple.fyp.Objects.EMailObject;
 import com.example.apple.fyp.Objects.Email;
@@ -47,6 +49,7 @@ public class MyApplication extends Application {
     String CuurentEmailFolderToMove = "";
     EMailObject CurrentReadEmail = null;
     List<BlockMail> blockMails;
+    List<Archive> archiveList;
 
 
     @Override
@@ -59,10 +62,15 @@ public class MyApplication extends Application {
 
         listNewEmails = new EasySave(getApplicationContext()).retrieveList("Emails", EMailObject[].class);
         blockMails = new EasySave(getApplicationContext()).retrieveList("Block", BlockMail[].class);
+        archiveList = new EasySave(getApplicationContext()).retrieveList("archiveList", Archive[].class);
 
         if (blockMails == null) {
             blockMails = new LinkedList<>();
         }
+        if (archiveList == null) {
+            archiveList = new LinkedList<>();
+        }
+
         ALlEmailMenusOnline = new LinkedHashMap<>();
         if (listNewEmails == null) {
             listNewEmails = new LinkedList<>();
@@ -348,4 +356,24 @@ public class MyApplication extends Application {
     }
 
 
+    public Archive getArchive(String Email) {
+        for (Archive archive : archiveList) {
+            if (archive.getEmail().equals(Email))
+                return archive;
+        }
+        return new Archive();
+    }
+
+    public void setArchive(Archive archive) {
+        for (Archive archive1 : archiveList) {
+            if (archive1.getEmail().equals(archive.getEmail())) {
+                if (archive1.getCheck()) {
+                    Toast.makeText(getApplicationContext(), "Already Archived", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+        this.archiveList.add(archive);
+        new EasySave(getApplicationContext()).saveList("archiveList", archiveList);
+    }
 }
