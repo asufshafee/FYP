@@ -176,7 +176,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                             Position1 = Position;
                             String EmailFolderToMOve = list.get(Position).getMoved();
                             myApplication.setCurrentEmailMoveFolderName(list.get(Position).getMoved().split("/")[0]);
-                            myApplication.setCuurentEmailFolderToMove("Archive" + "/" + myApplication.getArchive().getEmail());
+                            myApplication.setCuurentEmailFolderToMove("Archive1" + "/" + myApplication.getArchive().getEmail());
                             myApplication.setCurrentEmailMoveObject(list.get(Position));
                             if (myApplication.getArchive().getEmail().equals(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()))
                                 Check = true;
