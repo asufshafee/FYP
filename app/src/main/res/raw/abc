@@ -1,8 +1,4 @@
-he is checking now
+Yaar tab liya ha sir se lkn us me API ka error a raha ha please solve it
 
-chalo mera dekho smj a gai ha na kya karna... me wait kar raha hu....
-ha g kami ko bta diya ha or uska github b connect ha
-
-
-Shukar ha Ussy kahy uttha test kar our mujhy reply kar taky main waha sa relex ho jao time
-tera kam 1 hour main ho jaye ha max no worry
+ye error a raha ha. ye set kar dena yaar please
+minSdk(API 19) > deviceSdk(API 61)
