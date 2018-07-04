@@ -451,6 +451,7 @@ public class Home extends AppCompatActivity
         protected Void doInBackground(String... params) {
             //Copy you logic to calculate progress and call
 
+            ShowProgress();
             Store store = null;
             Properties properties = new Properties();
             properties.put("mail.store.protocol", "imaps");
@@ -467,8 +468,11 @@ public class Home extends AppCompatActivity
                     store.connect("pop3.live.com", myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail(), myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getPassword());
 
             } catch (NoSuchProviderException e) {
+                HideProgress(e.getMessage());
                 e.printStackTrace();
             } catch (MessagingException e) {
+                HideProgress(e.getMessage());
+
                 e.printStackTrace();
             }
 
@@ -481,6 +485,7 @@ public class Home extends AppCompatActivity
                     }
 
                 } catch (MessagingException e) {
+                    HideProgress(e.getMessage());
                     e.printStackTrace();
                 }
 
@@ -492,6 +497,8 @@ public class Home extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Void result) {
+            HideProgress("Folder Created");
+
         }
     }
 
@@ -682,6 +689,28 @@ public class Home extends AppCompatActivity
         protected void onPostExecute(Void result) {
             progressDialog.dismiss();
         }
+    }
+
+
+    public void ShowProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.show();
+
+            }
+        });
+    }
+
+    public void HideProgress(final String Message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), Message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 }
