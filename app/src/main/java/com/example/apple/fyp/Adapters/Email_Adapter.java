@@ -163,34 +163,47 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
         Optiondialog.setCancelable(true);
         Optiondialog.setContentView(R.layout.select_an_layout_dialog);
 
-        if (myApplication.getArchive(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()) != null) {
-
-            if (myApplication.getArchive(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()).getCheck()) {
+        if (myApplication.getArchive() != null) {
+            if (myApplication.getArchive().getCheck()) {
                 Optiondialog.findViewById(R.id.Archive).setVisibility(View.VISIBLE);
                 Optiondialog.findViewById(R.id.Archive).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
                         if (AppUtils.haveNetworkConnection(context)) {
-                            new CreateFolderTask().execute("Archive");
-                            List<String> menusList = myApplication.getOnlineManus();
-                            menusList.add("Archive");
-                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
-                            menusList.remove(menusList.size() - 1);
-                            menusList.add("Archive");
-                            menusList.add("Logout");
-                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
-                            myApplication.AddMenus(menusList);
-                            ((Home) context).UpdateMenus();
+
+                            String EmailFolderToMOve = list.get(Position).getMoved();
+                            myApplication.setCurrentEmailMoveFolderName(list.get(Position).getMoved());
+                            myApplication.setCuurentEmailFolderToMove("Archive" + "/" + myApplication.getArchive().getEmail());
                             myApplication.setCurrentEmailMoveObject(list.get(Position));
-                            myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
-                            myApplication.setCuurentEmailFolderToMove("Archive");
+                            if (myApplication.getArchive().getEmail().equals(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()))
+                                Check = true;
+                            new MoveEmailToOtherTask().execute();
                             Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
-                            list.get(Position).setMoved("Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
-                            myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
-                            String MovedFolder = "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
+                            list.get(Position).setMoved("Archive" + "/" + myApplication.getArchive().getEmail());
+                            myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getArchive().getEmail());
                             notifyDataSetChanged();
                             Optiondialog.dismiss();
+
+//                            new CreateFolderTask().execute("Archive");
+//                            List<String> menusList = myApplication.getOnlineManus();
+//                            menusList.add("Archive");
+//                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+//                            menusList.remove(menusList.size() - 1);
+//                            menusList.add("Archive");
+//                            menusList.add("Logout");
+//                            menusList = new ArrayList<>(new LinkedHashSet<>(menusList));
+//                            myApplication.AddMenus(menusList);
+//                            ((Home) context).UpdateMenus();
+//                            myApplication.setCurrentEmailMoveObject(list.get(Position));
+//                            myApplication.setCurrentEmailMoveFolderName(FolderName.split("/")[0]);
+//                            myApplication.setCuurentEmailFolderToMove("Archive");
+//                            Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
+//                            list.get(Position).setMoved("Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+//                            myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail());
+//                            String MovedFolder = "Archive" + "/" + myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail();
+//                            notifyDataSetChanged();
+//                            Optiondialog.dismiss();
                         } else {
                             Toast.makeText(context, "No internet Connection", Toast.LENGTH_SHORT).show();
                         }
@@ -660,7 +673,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                             emailFolder = store2.getFolder(FolderName.split("/")[0]);
                         }
                     } else {
-                        emailFolder = store.getFolder(FolderName);
+                        emailFolder = store.getFolder(FolderName.split("/")[0]);
                     }
                 } else {
                     if (FolderName.toLowerCase().contains("gmail")) {
@@ -670,12 +683,28 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                                 FolderName.contains("Sent Mail") ||
                                 FolderName.contains("Spam") ||
                                 FolderName.contains("Starred")) {
-                            emailFolder = store2.getFolder("[Gmail]/" + FolderName);
+                            if (FolderName.contains("/")) {
+                                emailFolder = store2.getFolder("[Gmail]/" + FolderName.split("/")[0]);
+
+                            } else {
+                                emailFolder = store2.getFolder("[Gmail]/" + FolderName);
+
+                            }
+                        } else {
+                            if (FolderName.contains("/")) {
+                                emailFolder = store2.getFolder(FolderName.split("/")[0]);
+
+                            } else {
+                                emailFolder = store2.getFolder(FolderName);
+                            }
+                        }
+                    } else {
+                        if (FolderName.contains("/")) {
+                            emailFolder = store2.getFolder(FolderName.split("/")[0]);
+
                         } else {
                             emailFolder = store2.getFolder(FolderName);
                         }
-                    } else {
-                        emailFolder = store.getFolder(FolderName);
                     }
                 }
 
@@ -697,6 +726,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 // use READ_ONLY if you don't wish the messages
                 // to be marked as read after retrieving its content
                 emailFolder.open(Folder.READ_WRITE);
+                MoveFolder.open(Folder.READ_WRITE);
                 Message message = emailFolder.getMessage(myApplication.getCurrentEmailMoveObject().getId());
                 message.getFolder().copyMessages(new Message[]{message}, MoveFolder);
                 message.setFlag(Flags.Flag.DELETED, true);
@@ -704,7 +734,6 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
             } catch (Exception e) {
                 ((Home) context).HideProgress(e.getMessage());
-
                 String Mesage = e.getMessage();
                 e.printStackTrace();
             }

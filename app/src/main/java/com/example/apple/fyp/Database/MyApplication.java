@@ -49,7 +49,7 @@ public class MyApplication extends Application {
     String CuurentEmailFolderToMove = "";
     EMailObject CurrentReadEmail = null;
     List<BlockMail> blockMails;
-    List<Archive> archiveList;
+    Archive archiveList;
 
 
     @Override
@@ -62,13 +62,13 @@ public class MyApplication extends Application {
 
         listNewEmails = new EasySave(getApplicationContext()).retrieveList("Emails", EMailObject[].class);
         blockMails = new EasySave(getApplicationContext()).retrieveList("Block", BlockMail[].class);
-        archiveList = new EasySave(getApplicationContext()).retrieveList("archiveList", Archive[].class);
+        archiveList = new EasySave(getApplicationContext()).retrieveModel("archiveList", Archive.class);
 
         if (blockMails == null) {
             blockMails = new LinkedList<>();
         }
         if (archiveList == null) {
-            archiveList = new LinkedList<>();
+            archiveList = new Archive();
         }
 
         ALlEmailMenusOnline = new LinkedHashMap<>();
@@ -139,6 +139,7 @@ public class MyApplication extends Application {
         for (EMailObject eMailObject1 : listNewEmails) {
             if (eMailObject1.getUniqueID() == eMailObject.getUniqueID()) {
                 eMailObject1.setDeleted(true);
+                eMailObject.setMoved("Spam/" + eMailObject.getMoved().split("/")[1]);
             }
         }
         SaveEmails();
@@ -357,26 +358,17 @@ public class MyApplication extends Application {
     }
 
 
-    public Archive getArchive(String Email) {
-        for (Archive archive : archiveList) {
-            if (archive.getEmail().equals(Email))
-                return archive;
-        }
-        return new Archive();
+    public Archive getArchive() {
+        return archiveList;
     }
 
     public void setArchive(Archive archive) {
-        for (Archive archive1 : archiveList) {
-            if (archive1.getEmail().equals(archive.getEmail())) {
-                if (archive1.getCheck()) {
-                    Toast.makeText(getApplicationContext(), "Already Archived", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
+        if (!archiveList.getCheck()) {
+            Toast.makeText(getApplicationContext(), "Archive Added", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Archive Updated", Toast.LENGTH_SHORT).show();
         }
-        List<Archive> archiveList1 = new LinkedList<>(archiveList);
-        archiveList1.add(archive);
-        this.archiveList = new LinkedList<>(archiveList1);
-        new EasySave(getApplicationContext()).saveList("archiveList", archiveList);
+        archiveList = archive;
+        new EasySave(getApplicationContext()).saveModel("archiveList", archiveList);
     }
 }

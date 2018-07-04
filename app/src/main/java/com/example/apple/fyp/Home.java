@@ -285,7 +285,6 @@ public class Home extends AppCompatActivity
         dialog.findViewById(R.id.AddArchive).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Archive archive = new Archive();
                 archive.setCheck(true);
                 archive.setEmail(AccountRegistered.get(Account.getSelectedIndex()));
@@ -436,8 +435,6 @@ public class Home extends AppCompatActivity
                 NewLogin = "Yahoo";
                 new LoginTask().execute();
                 progressDialog.show();
-
-
             }
         });
 
@@ -448,16 +445,12 @@ public class Home extends AppCompatActivity
                 NewLogin = "Gmail";
                 new LoginTask().execute();
                 progressDialog.show();
-
-
             }
         });
 
         try {
             dialog.show();
-
-        }catch (Exception  e)
-        {
+        } catch (Exception e) {
 
         }
 
