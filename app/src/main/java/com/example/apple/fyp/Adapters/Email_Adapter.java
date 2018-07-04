@@ -58,6 +58,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
     String FolderName;
     ProgressDialog progressDialog;
     Boolean Check = false;
+    Boolean MoveedTrue = false;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CardView Card;
@@ -172,17 +173,14 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
                         if (AppUtils.haveNetworkConnection(context)) {
 
+                            Position1 = Position;
                             String EmailFolderToMOve = list.get(Position).getMoved();
-                            myApplication.setCurrentEmailMoveFolderName(list.get(Position).getMoved());
+                            myApplication.setCurrentEmailMoveFolderName(list.get(Position).getMoved().split("/")[0]);
                             myApplication.setCuurentEmailFolderToMove("Archive" + "/" + myApplication.getArchive().getEmail());
                             myApplication.setCurrentEmailMoveObject(list.get(Position));
                             if (myApplication.getArchive().getEmail().equals(myApplication.getEmail(myApplication.getCurrentLogin()).get(myApplication.getCurrentLoginEmailIndex()).getEmail()))
                                 Check = true;
                             new MoveEmailToOtherTask().execute();
-                            Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
-                            list.get(Position).setMoved("Archive" + "/" + myApplication.getArchive().getEmail());
-                            myApplication.MoveEmail(list.get(Position), "Archive" + "/" + myApplication.getArchive().getEmail());
-                            notifyDataSetChanged();
                             Optiondialog.dismiss();
 
 //                            new CreateFolderTask().execute("Archive");
@@ -731,6 +729,7 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
                 message.getFolder().copyMessages(new Message[]{message}, MoveFolder);
                 message.setFlag(Flags.Flag.DELETED, true);
                 message.getFolder().expunge();
+                MoveedTrue = true;
 
             } catch (Exception e) {
                 ((Home) context).HideProgress(e.getMessage());
@@ -745,10 +744,18 @@ public class Email_Adapter extends RecyclerView.Adapter<Email_Adapter.MyViewHold
 
         @Override
         protected void onPostExecute(Void result) {
+            if (MoveedTrue) {
+                Toast.makeText(context, "Email Moved", Toast.LENGTH_SHORT).show();
+                list.get(Position1).setMoved("Archive" + "/" + myApplication.getArchive().getEmail());
+                myApplication.MoveEmail(list.get(Position1), "Archive" + "/" + myApplication.getArchive().getEmail());
+                notifyDataSetChanged();
+            }
             ((Home) context).HideProgress("Moved");
 
         }
     }
+
+    int Position1;
 
     private class MoveToArchive extends AsyncTask<String, Void, Void> {
 
